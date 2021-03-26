@@ -29,6 +29,27 @@ module.exports = function(app, swig) {
         res.send(respuesta);
     })
 
+    app.get('/autores/filtrar/:rol', function (req, res) {
+        let autores = [ {
+            "nombre" : "Autor1",
+            "grupo" : "Grupo1",
+            "rol" : "guitarrista"
+        }, {
+            "nombre" : "Autor2",
+            "grupo" : "Grupo2",
+            "rol" : "cantante"
+        }, {
+            "nombre" : "Autor3",
+            "grupo" : "Grupo1",
+            "rol" : "bateria"
+        } ];
+        let respuesta = swig.renderFile('views/fautores-lista.html', {
+            autores : autores,
+            rolfiltrado :req.params.rol
+        });
+        res.send(respuesta);
+    })
+
     app.get('/autores/:param', function(req, res) {
         res.redirect("/autores");
     });
