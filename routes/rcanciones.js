@@ -155,14 +155,29 @@ module.exports = function(app, swig, gestorBD) {
     };
 
     app.get('/cancion/:id', function (req, res) {
-        let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id) };
+        let criterioComentario = {
+            "cancion_id" : gestorBD.mongo.ObjectID(req.params.id)
+        }
+        let comentariosCargados;
+        gestorBD.obtenerComentarios(criterioComentario,function(comentarios){
+            if ( comentarios == null ){
+                res.send("Error al recuperar los comentarios.");
+            } else {
+                comentariosCargados = comentarios;
+            }
+        });
+
+        let criterio = {
+            "_id" : gestorBD.mongo.ObjectID(req.params.id)
+        };
         gestorBD.obtenerCanciones(criterio,function(canciones){
             if ( canciones == null ){
                 res.send("Error al recuperar la canción.");
             } else {
                 let respuesta = swig.renderFile('views/bcancion.html',
                     {
-                        cancion : canciones[0]
+                        cancion : canciones[0],
+                        comentarios : comentariosCargados
                     });
                 res.send(respuesta);
             }
