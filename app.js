@@ -51,6 +51,7 @@ routerUsuarioAutor.use(function(req, res, next) {
         console.log(canciones[0]);
         if(canciones[0].autor == req.session.usuario ){
             next();
+            return;
         } else {
             res.redirect("/tienda");
         }
@@ -60,6 +61,8 @@ routerUsuarioAutor.use(function(req, res, next) {
 //Aplicar routerUsuarioAutor
 app.use("/cancion/modificar",routerUsuarioAutor);
 app.use("/cancion/eliminar",routerUsuarioAutor);
+app.use("/cancion/comprar",routerUsuarioSession);
+app.use("/compras",routerUsuarioSession);
 
 //routerAudios
 let routerAudios = express.Router();
@@ -71,10 +74,24 @@ routerAudios.use(function(req, res, next) {
     gestorBD.obtenerCanciones(
         {"_id": mongo.ObjectID(idCancion) }, function (canciones) {
 
-            if(req.session.usuario && canciones[0].autor == req.session.usuario ){
+            // if(req.session.usuario && canciones[0].autor == req.session.usuario ){
+            if( canciones[0].autor == req.session.usuario ){
                 next();
+                return;
             } else {
-                res.redirect("/tienda");
+                let criterio = {
+                    usuario : req.session.usuario,
+                    cancionId : mongo.ObjectID(idCancion)
+                };
+
+                gestorBD.obtenerCompras(criterio ,function(compras){
+                    if (compras != null && compras.length > 0 ){
+                        next();
+                        return;
+                    } else {
+                        res.redirect("/tienda");
+                    }
+                });
             }
     })
 });
