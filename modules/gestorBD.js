@@ -90,6 +90,22 @@ module.exports = {
             }
         });
     },
+    eliminarCancion : function(criterio, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('canciones');
+                collection.remove(criterio, function(err, result) {
+                    if (err) { funcionCallback(null);
+                    } else {
+                        funcionCallback(result);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
     insertarComentario : function(comentario, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -135,6 +151,40 @@ module.exports = {
                         funcionCallback(null);
                     } else {
                         funcionCallback(result);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+    insertarFavorito : function(favorita, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('favoritos');
+                collection.insertOne(favorita, function(err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result.ops[0]._id);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+    obtenerFavoritos : function(criterio,funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('favoritos');
+                collection.find(criterio).toArray(function(err, favoritos) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(favoritos);
                     }
                     db.close();
                 });
