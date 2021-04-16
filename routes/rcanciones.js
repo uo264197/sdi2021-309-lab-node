@@ -193,6 +193,27 @@ module.exports = function(app, swig, gestorBD) {
             }
         });
 
+        let puedeComprar;
+        puedeComprar = true;
+        let criterioCompras = { "usuario" : req.session.usuario };
+        gestorBD.obtenerCompras(criterioCompras ,function(compras){
+            if (compras==null) {
+                res.send("Error al listar las compras");
+            } else {
+                if (compras.length==0) {
+                    puedeComprar = false;
+                }
+                else {
+                    let cancionesCompradasIds = [];
+                    for(let i=0; i<compras.length; i++) {
+                        if (compras[i].cancionId == req.params.id) {
+                            puedeComprar = false;
+                        }
+                    }
+                }
+            }
+        });
+
         let criterio = {
             "_id" : gestorBD.mongo.ObjectID(req.params.id)
         };
@@ -200,10 +221,13 @@ module.exports = function(app, swig, gestorBD) {
             if ( canciones == null ){
                 res.send("Error al recuperar la canción.");
             } else {
+                if (canciones[0].autor == req.session.usuario)
+                    puedeComprar = false;
                 let respuesta = swig.renderFile('views/bcancion.html',
                     {
                         cancion : canciones[0],
-                        comentarios : comentariosCargados
+                        comentarios : comentariosCargados,
+                        puedeComprar : puedeComprar
                     });
                 res.send(respuesta);
             }

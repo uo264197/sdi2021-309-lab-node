@@ -20,7 +20,7 @@ module.exports = function(app, swig, gestorBD) {
             res.redirect("/tienda"); return;
         }
         let favorito = {
-            id : req.body.id,
+            id : req.query.id,
             nombre : req.body.nombre,
             precio : req.body.precio,
             autor : req.session.usuario
