@@ -123,10 +123,16 @@ app.get('/', function (req, res) {
 
 app.use( function(err, req, res, next) {
     console.log("Error producido: " + err); //mostramos el error en consola
-    if (!res.headersSent) {
+    let variableError = ""+err;
+    let respuesta = swig.renderFile('views/error.html',
+        {
+            error : variableError
+        });
+    res.send(respuesta);
+   /* if (!res.headersSent) {
         res.status(400);
         res.send("Recurso no disponible");
-    }
+    }*/
 });
 
 // Lanzar el servidor
